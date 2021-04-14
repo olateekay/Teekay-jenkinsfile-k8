@@ -24,7 +24,11 @@ pipeline {
             script {
                   sh("""#!/bin/bash -e
                       # 
-                      echo Build Docker
+                      echo "Build Docker"
+                      cd sre-wizeline-alege-olatokunbo/cidr_convert_api/node
+                      docker build -t my-image:some-tag .
+                      docker tag cidr_convert_api:0.0.1 wizelinedevops/cidr_convert_api:0.0.1
+                      
                   """.stripIndent().trim())
             }
           }      
@@ -39,6 +43,19 @@ pipeline {
             }
           }      
         }
+
+        stage('Push artifact to registry') {
+          steps {
+            script {
+                  sh("""#!/bin/bash -e
+                      # 
+                      echo "Deploy to environments"
+                      docker push wizelinedevops/cidr_convert_api:0.0.1
+                  """.stripIndent().trim())
+            }
+          }      
+        }
+
         stage('Deploy to environments') {
           steps {
             script {
