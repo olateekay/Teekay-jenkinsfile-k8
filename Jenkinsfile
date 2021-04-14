@@ -26,6 +26,7 @@ pipeline {
                       # 
                       echo "Build Docker"
                       pwd
+                      ls -la
                       cd ${WORKSPACE}/cidr_convert_api/node
                       docker build -t my-image:some-tag .
                       docker tag cidr_convert_api:0.0.1 wizelinedevops/cidr_convert_api:0.0.1
