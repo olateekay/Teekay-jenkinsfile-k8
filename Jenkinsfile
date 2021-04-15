@@ -23,8 +23,6 @@ pipeline {
                   sh("""#!/bin/bash -e
                       # 
                       echo "Build Docker"
-                      pwd
-                      ls -la
                       cd ${WORKSPACE}/cidr_convert_api/node
                       docker build -t wizelinedevops/cidr_convert_api:0.0.1 .
                   """.stripIndent().trim())
