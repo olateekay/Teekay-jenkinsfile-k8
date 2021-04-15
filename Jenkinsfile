@@ -56,7 +56,7 @@ pipeline {
             not {
             anyOf {
               branch 'master'
-              DEFAULT_ENVIRONMENT="production"
+              DEFAULT_ENVIRONMENT = "production"
               // DEFAULT_ENVIRONMENT="staging"
              }
             }
@@ -81,7 +81,7 @@ pipeline {
           when {
             anyOf {
               branch 'staging'
-              DEFAULT_ENVIRONMENT="staging"
+              DEFAULT_ENVIRONMENT = "staging"
             }
           }
           steps {
@@ -103,7 +103,7 @@ pipeline {
           when {
             anyOf {
               branch 'master'
-              DEFAULT_ENVIRONMENT ="production"
+              DEFAULT_ENVIRONMENT = "production"
             }
           }
           steps {
