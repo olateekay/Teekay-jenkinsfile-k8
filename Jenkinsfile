@@ -5,9 +5,9 @@ pipeline {
     //   string(name: 'limit_inventory_group', defaultValue: '',  description: 'This is a group from the inventory file')
     //   string(name: 'ansible_tag', defaultValue: '', description: 'Ansible tag to only run specific tasks')
     // }
-//  environment {
-//       SUB_ENVIRONMENT=null
-//     }
+ environment {
+      SUB_ENVIRONMENT=null
+    }
     stages {
         stage("Working Directory") {
           steps {
@@ -55,8 +55,15 @@ pipeline {
         }
 
 
+
+
+
         stage('Prepare Kubernetes Auth') {
           steps {
+              script {
+              if ( env.SUB_ENVIRONMENT == null ) {
+                env.SUB_ENVIRONMENT = 'dev'
+              }
             withCredentials([file(credentialsId: 'GPG_KUBE_CONFIG', variable: 'kubeconfig-gpg')]) {
                   sh """#!/bin/bash -e
                       #
