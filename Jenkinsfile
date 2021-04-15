@@ -54,7 +54,19 @@ pipeline {
           }      
         }
 
-        stage('Deploy to environments') {
+
+
+
+
+
+        stage('Deploy to development environment') {
+          when {
+            not {
+            anyOf {
+              branch 'master'
+             }
+            }
+          }
           steps {
               script {
               if ( env.SUB_ENVIRONMENT == null ) {
@@ -64,7 +76,7 @@ pipeline {
                   sh '''#!/bin/bash -e
                       #
                       echo "Decrypt kubeconfig"
-                      kubectl --kubeconfig=$kubeconfig get ns
+                      kubectl --kubeconfig=kubeconfig --namespace=development set image deployment/api api=wizelinedevops/cidr_convert_api:0.0.1
                   '''
             }
           }
