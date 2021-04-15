@@ -66,7 +66,9 @@ pipeline {
                       gpg -d --batch --passphrase digWK9hwaJz7Cj $GPG_KUBE_CONFIG
                       ls -latr
                   """.stripIndent().trim())
-}
+            }
+          }
+         }
 
 
         stage('Deploy to environments') {
