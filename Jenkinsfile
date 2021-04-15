@@ -12,10 +12,9 @@ pipeline {
 //       ANSIBLE_FORCE_COLOR="true"
 //     }
     stages {
-        stage("Initial cleanup") {
+        stage("Working Directory") {
           steps {
             dir("${WORKSPACE}") {
-              deleteDir()
             }
           }
         }
