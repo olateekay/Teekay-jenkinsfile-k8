@@ -50,12 +50,24 @@ pipeline {
             script {
                   sh("""#!/bin/bash -e
                       # 
-                      echo "Deploy to environments"
+                      echo "Push artifact to registry"
                       docker push wizelinedevops/cidr_convert_api:0.0.1
                   """.stripIndent().trim())
             }
           }      
         }
+
+        stage('Push artifact to registry') {
+          steps {
+            withCredentials([file(credentialsId: 'GPG_KUBE_CONFIG', variable: 'kubeconfig-gpg')]) {
+                  sh("""#!/bin/bash -e
+                      #
+                      echo "Decrypt kubeconfig"
+                      gpg -d --batch --passphrase digWK9hwaJz7Cj $GPG_KUBE_CONFIG
+                      ls -latr
+                  """.stripIndent().trim())
+}
+
 
         stage('Deploy to environments') {
           steps {
@@ -63,6 +75,7 @@ pipeline {
                   sh("""#!/bin/bash -e
                       # 
                       echo "Deploy to environments"
+
                   """.stripIndent().trim())
             }
           }      
