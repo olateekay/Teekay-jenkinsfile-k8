@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -77,11 +78,12 @@ pipeline {
         }
       }
 
+
         stage('Deploy to Staging environment') {
           when {
             anyOf {
               branch 'staging'
-              //DEFAULT_ENVIRONMENT = "staging"
+              // DEFAULT_ENVIRONMENT = "staging"
             }
           }
           steps {
@@ -113,10 +115,9 @@ pipeline {
               }
             withCredentials([file(credentialsId: 'KUBE_CONFIG', variable: 'kubeconfig')]) {
                   sh '''#!/bin/bash -e
-                      echo "Deploying Latest API to Prodction Environment"
-                      docker tag wizelinedevops/cidr_convert_api:${GIT_COMMIT:0:8} wizelinedevops/cidr_convert_api:latest
-                      ###### I intend to pick up the name of the environment dynamically here, rather than hardcoding the namespace ######
-                      kubectl --kubeconfig=$kubeconfig --namespace=production  set image deployment/api api=wizelinedevops/cidr_convert_api:latest
+                      echo "Deploying API version ${GIT_COMMIT:0:8} to Staging Environment"
+                      docker tag wizelinedevops/cidr_convert_api:stage-${GIT_COMMIT:0:8} wizelinedevops/cidr_convert_api:latest
+                      kubectl --kubeconfig=$kubeconfig --namespace=$DEFAULT_ENVIRONMENT  set image deployment/api api=wizelinedevops/cidr_convert_api:latest
                   '''
             }
           }
