@@ -5,9 +5,9 @@ pipeline {
     //   string(name: 'limit_inventory_group', defaultValue: '',  description: 'This is a group from the inventory file')
     //   string(name: 'ansible_tag', defaultValue: '', description: 'Ansible tag to only run specific tasks')
     // }
- environment {
-      SUB_ENVIRONMENT=null
-    }
+//  environment {
+//       SUB_ENVIRONMENT=null
+//     }
     stages {
         stage("Working Directory") {
           steps {
@@ -55,44 +55,15 @@ pipeline {
         }
 
 
-        // stage('Terraform Plan Changes') {
-        //   steps {
-        //     script {
-        //       if ( env.SUB_ENVIRONMENT == null ) {
-        //         env.SUB_ENVIRONMENT = 'dev'
-        //       }
-        //     }
-        //     withCredentials([sshUserPrivateKey(credentialsId: "gitlab-ssh-jenkins", keyFileVariable: 'keyfile')]) {
-        //       withAWS(role: 'TerraformBuild', roleAccount: "$AWS_DEV", roleSessionName: "${SESSION_NAME}") {
-        //         sh """
-        //           export GIT_SSH_COMMAND="ssh -i $keyfile -o StrictHostKeyChecking=no"
-                  
-        //           terraform init \
-        //               -backend-config "role_arn=arn:aws:iam::${AWS_TOOLING}:role/${AWS_ROLE_TF_STATE}" \
-        //               -backend-config key="copo/infrastructure/${env.SUB_ENVIRONMENT}/terraform.tfstate"
-
-        //           terraform plan -out terraform-plan -var "sub_environment=${env.SUB_ENVIRONMENT}"
-        //         """
-        //       }
-        //     }
-        //   }
-        // }
-
-
-
         stage('Prepare Kubernetes Auth') {
           steps {
-              script {
-              if ( env.SUB_ENVIRONMENT == null ) {
-                env.SUB_ENVIRONMENT = 'dev'
-              }
             withCredentials([file(credentialsId: 'GPG_KUBE_CONFIG', variable: 'kubeconfig-gpg')]) {
-                  sh """#!/bin/bash -e
+                  sh( """#!/bin/bash -e
                       #
                       echo "Decrypt kubeconfig"
                       gpg -d --batch --passphrase digWK9hwaJz7Cj $GPG_KUBE_CONFIG
                       ls -latr
-                  """
+                  """.stripIndent().trim())
             }
           }
         }
