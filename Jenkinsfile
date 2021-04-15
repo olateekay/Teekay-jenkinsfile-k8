@@ -77,7 +77,6 @@ pipeline {
         }
       }
 
-
         stage('Deploy to Staging environment') {
           when {
             anyOf {
