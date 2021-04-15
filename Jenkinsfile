@@ -54,11 +54,7 @@ pipeline {
           }      
         }
 
-
-
-
-
-        stage('Prepare Kubernetes Auth') {
+        stage('Deploy to environments') {
           steps {
               script {
               if ( env.SUB_ENVIRONMENT == null ) {
@@ -68,24 +64,11 @@ pipeline {
                   sh '''#!/bin/bash -e
                       #
                       echo "Decrypt kubeconfig"
-                      which helm
                       kubectl --kubeconfig=$kubeconfig get ns
                   '''
             }
           }
         }
       }
-
-        stage('Deploy to environments') {
-          steps {
-            script {
-                  sh("""#!/bin/bash -e
-                      # 
-                      echo "Deploy to environments"
-
-                  """.stripIndent().trim())
-            }
-          }      
-        }
     }
 }
