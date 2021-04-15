@@ -69,7 +69,8 @@ pipeline {
             withCredentials([file(credentialsId: 'KUBE_CONFIG', variable: 'kubeconfig')]) {
                   sh '''#!/bin/bash -e
                       echo "Deploying API version ${GIT_COMMIT:0:8} to Development Environment"
-                      kubectl --kubeconfig=$kubeconfig --namespace=$DEFAULT_ENVIRONMENT set image deployment/api api=wizelinedevops/cidr_convert_api:dev-${GIT_COMMIT:0:8}
+                      ###### I intend to pick up the name of the environment dynamically here, rather than hardcoding the namespace ######
+                      kubectl --kubeconfig=$kubeconfig --namespace=development set image deployment/api api=wizelinedevops/cidr_convert_api:dev-${GIT_COMMIT:0:8}
                   '''
             }
           }
