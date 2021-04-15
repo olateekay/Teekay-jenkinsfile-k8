@@ -20,17 +20,6 @@ pipeline {
           }
         }
 
-    stage('Checkout')
-    {
-      steps {
-      checkout([$class: 'GitSCM', 
-      doGenerateSubmoduleConfigurations: false, 
-      extensions: [], 
-      submoduleCfg: [], 
-      userRemoteConfigs: [[url: 'https://github.com/wizeline/sre-wizeline-alege-olatokunbo.git']]])
-
-      }
-        }
 
         stage('Build Docker Image ') {
           steps {
