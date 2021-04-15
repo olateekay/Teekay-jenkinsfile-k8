@@ -72,9 +72,8 @@ pipeline {
               }
             withCredentials([file(credentialsId: 'KUBE_CONFIG', variable: 'kubeconfig')]) {
                   sh '''#!/bin/bash -e
-                      #
-                      echo "Decrypt kubeconfig"
-                      kubectl --kubeconfig=kubeconfig --namespace=development set image deployment/api api=wizelinedevops/cidr_convert_api:0.0.1
+                      echo "Deploying to dev"
+                      kubectl --kubeconfig=$kubeconfig --namespace=development set image deployment/api api=wizelinedevops/cidr_convert_api:0.0.1
                   '''
             }
           }
