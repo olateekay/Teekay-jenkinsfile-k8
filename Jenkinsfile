@@ -71,7 +71,7 @@ pipeline {
                       which gpg
                       env | grep kubeconfig
                       echo $kubeconfig
-                      kubectl --kubeconfig=kubeconfig get ns
+                      kubectl --kubeconfig=$kubeconfig get ns
 
                       ls -latr
                   '''
