@@ -5,32 +5,17 @@ pipeline {
     //   string(name: 'limit_inventory_group', defaultValue: '',  description: 'This is a group from the inventory file')
     //   string(name: 'ansible_tag', defaultValue: '', description: 'Ansible tag to only run specific tasks')
     // }
-//  environment {
-//       JENKINS_SSH_PRIVKEY="~/.ssh/jenkins.pem"
-//       JENKINS_KUBE_CONFIG_FILE="~/.kube/config"
-//       JENKINS_ANSIBLE_CFG_FILE="${WORKSPACE}/playbooks/ansible.cfg"
-//       ANSIBLE_FORCE_COLOR="true"
-//     }
+ environment {
+      SUB_ENVIRONMENT=null
+    }
     stages {
-        stage("Initial cleanup") {
+        stage("Working Directory") {
           steps {
             dir("${WORKSPACE}") {
-              deleteDir()
             }
           }
         }
 
-    stage('Checkout')
-    {
-      steps {
-      checkout([$class: 'GitSCM', 
-      doGenerateSubmoduleConfigurations: false, 
-      extensions: [], 
-      submoduleCfg: [], 
-      userRemoteConfigs: [[url: 'https://github.com/wizeline/sre-wizeline-alege-olatokunbo.git']]])
-
-      }
-        }
 
         stage('Build Docker Image ') {
           steps {
@@ -41,9 +26,7 @@ pipeline {
                       pwd
                       ls -la
                       cd ${WORKSPACE}/cidr_convert_api/node
-                      docker build -t my-image:some-tag .
-                      docker tag cidr_convert_api:0.0.1 wizelinedevops/cidr_convert_api:0.0.1
-                      
+                      docker build -t wizelinedevops/cidr_convert_api:0.0.1 .
                   """.stripIndent().trim())
             }
           }      
@@ -64,7 +47,7 @@ pipeline {
             script {
                   sh("""#!/bin/bash -e
                       # 
-                      echo "Deploy to environments"
+                      echo "Push artifact to registry"
                       docker push wizelinedevops/cidr_convert_api:0.0.1
                   """.stripIndent().trim())
             }
@@ -73,13 +56,19 @@ pipeline {
 
         stage('Deploy to environments') {
           steps {
-            script {
-                  sh("""#!/bin/bash -e
-                      # 
-                      echo "Deploy to environments"
-                  """.stripIndent().trim())
+              script {
+              if ( env.SUB_ENVIRONMENT == null ) {
+                env.SUB_ENVIRONMENT = 'dev'
+              }
+            withCredentials([file(credentialsId: 'KUBE_CONFIG', variable: 'kubeconfig')]) {
+                  sh '''#!/bin/bash -e
+                      #
+                      echo "Decrypt kubeconfig"
+                      kubectl --kubeconfig=$kubeconfig get ns
+                  '''
             }
-          }      
+          }
         }
+      }
     }
 }
