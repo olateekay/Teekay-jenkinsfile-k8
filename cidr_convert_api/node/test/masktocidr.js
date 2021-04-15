@@ -13,11 +13,9 @@ describe('maskToCidrFunction()', function () {
   });
 
   it('should return an Invalid', function () {
-    expect("Invalid").to.be.equal("Invalid");
-    expect("0.0.0.0").to.be.equal("Invalid");
-    expect("256.0.0.0").to.be.equal("Invalid");
-    expect("a.b.c.d").to.be.equal("Invalid");
-    expect("192.168.0.0").to.be.equal("Invalid");
-
+    expect("Invalid").to.be.equal(maskToCidrFunction("0.0.0.0"));
+    expect("Invalid").to.be.equal(maskToCidrFunction("256.0.0.0"));
+    expect("Invalid").to.be.equal(maskToCidrFunction("a.b.c.d"));
+    expect("Invalid").to.be.equal(maskToCidrFunction("192.168.0.0"));
   });
 });
