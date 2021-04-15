@@ -81,7 +81,7 @@ pipeline {
           when {
             anyOf {
               branch 'staging'
-              DEFAULT_ENVIRONMENT = "staging"
+              //DEFAULT_ENVIRONMENT = "staging"
             }
           }
           steps {
