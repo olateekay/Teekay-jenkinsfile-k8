@@ -1,12 +1,10 @@
 pipeline {
     agent any
-    // parameters {
-    //   string(name: 'inventory_file', defaultValue: 'dev',  description: 'This is the inventory file for the environment to deploy configuration')
-    //   string(name: 'limit_inventory_group', defaultValue: '',  description: 'This is a group from the inventory file')
-    //   string(name: 'ansible_tag', defaultValue: '', description: 'Ansible tag to only run specific tasks')
-    // }
  environment {
-      SUB_ENVIRONMENT=null
+      DEFAULT_ENVIRONMENT=null
+      DEV_ENVIROINMENT="development"
+      STAGING_ENVIRONMENT="staging"
+      PRODUCTION_ENVIRONMENT="production"
     }
     stages {
         stage("Working Directory") {
@@ -16,16 +14,16 @@ pipeline {
           }
         }
 
-
         stage('Build Docker Image ') {
           steps {
             script {
-                  sh("""#!/bin/bash -e
+                  sh('''#!/bin/bash -e
                       # 
                       echo "Build Docker"
+                      echo ${GIT_COMMIT}
                       cd ${WORKSPACE}/cidr_convert_api/node
-                      docker build -t wizelinedevops/cidr_convert_api:0.0.1 .
-                  """.stripIndent().trim())
+                      docker build -t wizelinedevops/cidr_convert_api:${GIT_COMMIT} .
+                  '''.stripIndent().trim())
             }
           }      
         }
@@ -67,8 +65,8 @@ pipeline {
           }
           steps {
               script {
-              if ( env.SUB_ENVIRONMENT == null ) {
-                env.SUB_ENVIRONMENT = 'dev'
+              if ( env.DEFAULT_ENVIRONMENT == null ) {
+                env.DEFAULT_ENVIRONMENT = 'dev'
               }
             withCredentials([file(credentialsId: 'KUBE_CONFIG', variable: 'kubeconfig')]) {
                   sh '''#!/bin/bash -e
