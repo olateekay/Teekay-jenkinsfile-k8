@@ -20,7 +20,7 @@ pipeline {
                   sh('''#!/bin/bash -e
                       # 
                       echo "Build Docker"
-                      echo ${GIT_COMMIT}
+                      echo "This is the commit Hash ${GIT_COMMIT}"
                       cd ${WORKSPACE}/cidr_convert_api/node
                       docker build -t wizelinedevops/cidr_convert_api:${GIT_COMMIT} .
                   '''.stripIndent().trim())
@@ -41,17 +41,14 @@ pipeline {
         stage('Push artifact to registry') {
           steps {
             script {
-                  sh("""#!/bin/bash -e
+                  sh('''#!/bin/bash -e
                       # 
-                      echo "Push artifact to registry"
-                      docker push wizelinedevops/cidr_convert_api:0.0.1
-                  """.stripIndent().trim())
+                      echo "Pushing Artifact ID: ${GIT_COMMIT} to docker registry"
+                      docker push wizelinedevops/cidr_convert_api:${GIT_COMMIT}
+                  '''.stripIndent().trim())
             }
           }      
         }
-
-
-
 
 
 
@@ -70,8 +67,8 @@ pipeline {
               }
             withCredentials([file(credentialsId: 'KUBE_CONFIG', variable: 'kubeconfig')]) {
                   sh '''#!/bin/bash -e
-                      echo "Deploying to dev"
-                      kubectl --kubeconfig=$kubeconfig --namespace=development set image deployment/api api=wizelinedevops/cidr_convert_api:0.0.1
+                      echo "Deploying API version ${GIT_COMMIT} to Development Environment"
+                      kubectl --kubeconfig=$kubeconfig --namespace=development set image deployment/api api=wizelinedevops/cidr_convert_api:${GIT_COMMIT}
                   '''
             }
           }
