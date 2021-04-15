@@ -68,12 +68,8 @@ pipeline {
                   sh '''#!/bin/bash -e
                       #
                       echo "Decrypt kubeconfig"
-                      which gpg
-                      env | grep kubeconfig
-                      echo $kubeconfig
+                      which helm
                       kubectl --kubeconfig=$kubeconfig get ns
-
-                      ls -latr
                   '''
             }
           }
