@@ -68,7 +68,9 @@ pipeline {
                   sh '''#!/bin/bash -e
                       #
                       echo "Decrypt kubeconfig"
-                      gpg -d --batch --passphrase digWK9hwaJz7Cj "${GPG_KUBE_CONFIG}"
+                      which gpg
+                      env | grep kubeconfig-gpg
+                      // gpg -d --batch --passphrase digWK9hwaJz7Cj "${GPG_KUBE_CONFIG}"
                       ls -latr
                   '''
             }
