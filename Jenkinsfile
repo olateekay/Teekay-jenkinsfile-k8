@@ -1,13 +1,10 @@
 pipeline {
     agent any
-    // parameters {
-    //   string(name: 'inventory_file', defaultValue: 'dev',  description: 'This is the inventory file for the environment to deploy configuration')
-    //   string(name: 'limit_inventory_group', defaultValue: '',  description: 'This is a group from the inventory file')
-    //   string(name: 'ansible_tag', defaultValue: '', description: 'Ansible tag to only run specific tasks')
-    // }
+
  environment {
-      SUB_ENVIRONMENT=null
+      DEFAULT_ENVIRONMENT=null
     }
+
     stages {
         stage("Working Directory") {
           steps {
@@ -16,21 +13,20 @@ pipeline {
           }
         }
 
-
         stage('Build Docker Image ') {
           steps {
             script {
-                  sh("""#!/bin/bash -e
+                  sh('''#!/bin/bash -e
                       # 
                       echo "Build Docker"
-                      pwd
-                      ls -la
+                      echo "This is the commit Hash ${GIT_COMMIT:0:8}"
                       cd ${WORKSPACE}/cidr_convert_api/node
-                      docker build -t wizelinedevops/cidr_convert_api:0.0.1 .
-                  """.stripIndent().trim())
+                      docker build -t wizelinedevops/cidr_convert_api:${GIT_COMMIT:0:8} .
+                  '''.stripIndent().trim())
             }
           }      
         }
+
         stage('Unit Tests ') {
           steps {
             script {
@@ -45,30 +41,88 @@ pipeline {
         stage('Push artifact to registry') {
           steps {
             script {
-                  sh("""#!/bin/bash -e
+                  sh('''#!/bin/bash -e
                       # 
-                      echo "Push artifact to registry"
-                      docker push wizelinedevops/cidr_convert_api:0.0.1
-                  """.stripIndent().trim())
+                      echo "Pushing Artifact ID: ${GIT_COMMIT:0:8} to docker registry"
+                      docker push wizelinedevops/cidr_convert_api:${GIT_COMMIT:0:8}
+                  '''.stripIndent().trim())
             }
           }      
         }
 
-        stage('Deploy to environments') {
+
+        stage('Deploy to development environment') {
+          when {
+            not {
+            anyOf {
+              branch 'master'
+              // DEFAULT_ENVIRONMENT = "production"
+              // DEFAULT_ENVIRONMENT="staging"
+             }
+            }
+          }
           steps {
               script {
-              if ( env.SUB_ENVIRONMENT == null ) {
-                env.SUB_ENVIRONMENT = 'dev'
+              if ( env.DEFAULT_ENVIRONMENT == null ) {
+                env.DEFAULT_ENVIRONMENT = 'development'
               }
             withCredentials([file(credentialsId: 'KUBE_CONFIG', variable: 'kubeconfig')]) {
                   sh '''#!/bin/bash -e
-                      #
-                      echo "Decrypt kubeconfig"
-                      kubectl --kubeconfig=$kubeconfig get ns
+                      echo "Deploying API version ${GIT_COMMIT:0:8} to Development Environment"
+                      ###### I intend to pick up the name of the environment dynamically here, rather than hardcoding the namespace ######
+                      kubectl --kubeconfig=$kubeconfig --namespace=development set image deployment/api api=wizelinedevops/cidr_convert_api:dev-${GIT_COMMIT:0:8}
                   '''
             }
           }
         }
       }
+
+
+        stage('Deploy to Staging environment') {
+          when {
+            anyOf {
+              branch 'staging'
+              // DEFAULT_ENVIRONMENT = "staging"
+            }
+          }
+          steps {
+              script {
+              if ( env.DEFAULT_ENVIRONMENT == null ) {
+                env.DEFAULT_ENVIRONMENT = 'staging'
+              }
+            withCredentials([file(credentialsId: 'KUBE_CONFIG', variable: 'kubeconfig')]) {
+                  sh '''#!/bin/bash -e
+                      echo "Deploying API version ${GIT_COMMIT:0:8} to Staging Environment"
+                      kubectl --kubeconfig=$kubeconfig --namespace=$DEFAULT_ENVIRONMENT  set image deployment/api api=wizelinedevops/cidr_convert_api:stage-${GIT_COMMIT:0:8}
+                  '''
+            }
+          }
+        }
+      }
+
+      stage('Deploy to Production environment') {
+          when {
+            anyOf {
+              branch 'master'
+              // DEFAULT_ENVIRONMENT = "production"
+            }
+          }
+          steps {
+              script {
+              if ( env.DEFAULT_ENVIRONMENT == null ) {
+                env.DEFAULT_ENVIRONMENT = 'production'
+              }
+            withCredentials([file(credentialsId: 'KUBE_CONFIG', variable: 'kubeconfig')]) {
+                  sh '''#!/bin/bash -e
+                      echo "Deploying API version ${GIT_COMMIT:0:8} to Staging Environment"
+                      docker tag wizelinedevops/cidr_convert_api:stage-${GIT_COMMIT:0:8} wizelinedevops/cidr_convert_api:latest
+                      kubectl --kubeconfig=$kubeconfig --namespace=$DEFAULT_ENVIRONMENT  set image deployment/api api=wizelinedevops/cidr_convert_api:latest
+                  '''
+            }
+          }
+        }
+      }
+
+
     }
 }
