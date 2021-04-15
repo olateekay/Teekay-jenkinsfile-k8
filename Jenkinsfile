@@ -56,7 +56,7 @@ pipeline {
             not {
             anyOf {
               branch 'master'
-              DEFAULT_ENVIRONMENT = "production"
+              // DEFAULT_ENVIRONMENT = "production"
               // DEFAULT_ENVIRONMENT="staging"
              }
             }
