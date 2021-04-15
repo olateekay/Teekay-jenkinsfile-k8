@@ -57,18 +57,18 @@ pipeline {
           }      
         }
 
-        stage('Push artifact to registry') {
-          steps {
-            withCredentials([file(credentialsId: 'GPG_KUBE_CONFIG', variable: 'kubeconfig-gpg')]) {
-                  sh("""#!/bin/bash -e
-                      #
-                      echo "Decrypt kubeconfig"
-                      gpg -d --batch --passphrase digWK9hwaJz7Cj $GPG_KUBE_CONFIG
-                      ls -latr
-                  """.stripIndent().trim())
-            }
-          }
-         }
+        // stage('Prepare Kubernetes Auth') {
+        //   steps {
+        //     withCredentials([file(credentialsId: 'GPG_KUBE_CONFIG', variable: 'kubeconfig-gpg')]) {
+        //           sh("""#!/bin/bash -e
+        //               #
+        //               echo "Decrypt kubeconfig"
+        //               gpg -d --batch --passphrase digWK9hwaJz7Cj $GPG_KUBE_CONFIG
+        //               ls -latr
+        //           """.stripIndent().trim())
+        //     }
+        //   }
+        //  }
 
 
         stage('Deploy to environments') {
