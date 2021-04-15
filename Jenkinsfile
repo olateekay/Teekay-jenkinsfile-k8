@@ -64,13 +64,14 @@ pipeline {
               if ( env.SUB_ENVIRONMENT == null ) {
                 env.SUB_ENVIRONMENT = 'dev'
               }
-            withCredentials([file(credentialsId: 'GPG_KUBE_CONFIG', variable: 'kubeconfig-gpg')]) {
+            withCredentials([file(credentialsId: 'KUBE_CONFIG', variable: 'kubeconfig')]) {
                   sh '''#!/bin/bash -e
                       #
                       echo "Decrypt kubeconfig"
                       which gpg
-                      env | grep kubeconfig-gpg
-                      echo $kubeconfig-gpg
+                      env | grep kubeconfig
+                      echo $kubeconfig
+                      kubectl --kubeconfig=kubeconfig get ns
 
                       ls -latr
                   '''
