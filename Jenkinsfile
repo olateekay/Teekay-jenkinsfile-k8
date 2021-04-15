@@ -113,7 +113,7 @@ pipeline {
               }
             withCredentials([file(credentialsId: 'KUBE_CONFIG', variable: 'kubeconfig')]) {
                   sh '''#!/bin/bash -e
-                      echo "Deploying API version ${GIT_COMMIT:0:8} to Prodction Environment"
+                      echo "Deploying Latest API to Prodction Environment"
                       docker tag wizelinedevops/cidr_convert_api:${GIT_COMMIT:0:8} wizelinedevops/cidr_convert_api:latest
                       ###### I intend to pick up the name of the environment dynamically here, rather than hardcoding the namespace ######
                       kubectl --kubeconfig=$kubeconfig --namespace=production  set image deployment/api api=wizelinedevops/cidr_convert_api:latest
