@@ -113,8 +113,8 @@ pipeline {
               }
             withCredentials([file(credentialsId: 'KUBE_CONFIG', variable: 'kubeconfig')]) {
                   sh '''#!/bin/bash -e
-                      echo "Deploying API version ${GIT_COMMIT:0:8} to Staging Environment"
-                      docker tag wizelinedevops/cidr_convert_api:stage-${GIT_COMMIT:0:8} wizelinedevops/cidr_convert_api:latest
+                      echo "Deploying API version ${GIT_COMMIT:0:8} to Prodction Environment"
+                      docker tag wizelinedevops/cidr_convert_api:${GIT_COMMIT:0:8} wizelinedevops/cidr_convert_api:latest
                       kubectl --kubeconfig=$kubeconfig --namespace=$DEFAULT_ENVIRONMENT  set image deployment/api api=wizelinedevops/cidr_convert_api:latest
                   '''
             }
