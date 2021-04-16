@@ -1,3 +1,4 @@
+// simple test
 import chai from 'chai';
 import { cidrToMaskFunction } from '../services/cidrtomask'
 
